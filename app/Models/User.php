@@ -2,16 +2,16 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Database\Factories\UserFactory;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
 class User extends Authenticatable
 {
-    /** @use HasFactory<UserFactory> */
-    use HasFactory, Notifiable;
+    use Notifiable;
+
+    protected $table = 'usuarios';
 
     /**
      * The attributes that are mass assignable.
@@ -19,9 +19,11 @@ class User extends Authenticatable
      * @var list<string>
      */
     protected $fillable = [
-        'name',
+        'nombre',
         'email',
         'password',
+        'rol',
+        'telefono',
     ];
 
     /**
@@ -42,8 +44,38 @@ class User extends Authenticatable
     protected function casts(): array
     {
         return [
-            'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
     }
+
+    // Helpers de rol
+    public function isAdmin():bool {
+        return $this->rol === 'admin';
+    }
+
+    public function isTecnico():bool {
+        return $this->rol === 'tecnico';
+    }
+
+    public function isGestora():bool {
+        return $this->rol === 'gestora';
+    }
+
+    public function isParticular():bool {
+        return $this->rol === 'particular';
+    }
+
+    // Relaciones
+    public function tecnico(): HasOne {
+        return $this->hasOne(Tecnico::class, 'usuario_id');
+    }
+
+    public function gestora():HasOne {
+        return $this->hasOne(Gestora::class, 'usuario_id');
+    }
+
+    public function incidencias(): HasMany {
+        return $this->hasMany(Incidencia::class, 'cliente_id');
+    }
+
 }

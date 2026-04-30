@@ -1,0 +1,58 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+
+class Incidencia extends Model
+{
+    protected $table = 'incidencias';
+    protected $fillable = [
+        'localizador',
+        'cliente_id',
+        'tecnico_id',
+        'especialidad_id',
+        'zona_id',
+        'descripcion',
+        'direccion',
+        'poblacion',
+        'codigo_postal',
+        'fecha_servicio',
+        'tipo_urgencia',
+        'estado',
+    ];
+
+    protected $casts = [
+        'fecha_servicio' => 'datetime',
+    ];
+
+    public function cliente(): BelongsTo {
+        return $this->belongsTo(User::class, 'cliente_id');
+    }
+
+    public function tecnico(): BelongsTo {
+        return $this->belongsTo(Tecnico::class, 'tecnico_id');
+    }
+
+    public function especialidad(): BelongsTo {
+        return $this->belongsTo(Especialidad::class, 'especialidad_id');
+    }
+
+    public function zona(): BelongsTo {
+        return $this->belongsTo(Zona::class, 'zona_id');
+    }
+
+    public function comision(): HasOne {
+        return $this->hasOne(Comision::class, 'incidencia_id');
+    }
+
+    public function gestora(): BelongsTo {
+        return $this->belongsTo(Gestora::class, 'gestora_id');
+    }
+
+    public function puedeCancelar(): bool {
+        return $this->fecha_servicio->diffInHours(now()) > 48 && !in_array($this->estado, ['Cancelada', 'Finalizada']);
+    }
+}
