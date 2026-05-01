@@ -3,10 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ $title ?? 'ReparaYa' }}</title>
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
+    {{ $styles ?? '' }}
 </head>
-<body class="flex flex-col min-h-screen bg-bg text-text font-body antialiased">
+<body class="bg-gray-100 text-gray-800 min-h-screen">
+
     {{ $slot }}
+
+    {{ $scripts ?? '' }}
 </body>
 </html>
