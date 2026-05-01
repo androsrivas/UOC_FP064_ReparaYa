@@ -4,17 +4,19 @@
         <p class="text-muted text-sm mt-1">Crea un compte per gestionar les teves avaries</p>
     </div>
 
+    <x-alert-msg />
+
     <form method="POST" action="{{ route('register') }}" class="space-y-4">
         @csrf
 
-        <x-ui.forms 
+        <x-ui.form 
             label="Nom complet" 
-            name="name" 
+            name="nombre" 
             placeholder="Ex: Joan Marc" 
             required 
         />
 
-        <x-ui.forms 
+        <x-ui.form
             label="Correu electrònic" 
             name="email" 
             type="email" 
@@ -34,12 +36,12 @@
         </div>
 
         <div class="pt-2">
-            <p class="text-[10px] text-muted leading-tight mb-4">
+            {{-- <p class="text-[10px] text-muted leading-tight mb-4">
                 En registrar-te, acceptes els nostres <a href="#" class="underline">termes de servei</a> i la <a href="#" class="underline">política de privacitat</a>.
-            </p>
-            <x-ui.buttons type="submit" class="w-full py-3">
+            </p> --}}
+            <x-ui.button type="submit" class="w-full py-3">
                 Crear el meu compte
-            </x-ui.buttons>
+            </x-ui.button>
         </div>
     </form>
 

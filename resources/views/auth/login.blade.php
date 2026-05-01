@@ -7,7 +7,7 @@
     <form method="POST" action="{{ route('login') }}" class="space-y-4">
         @csrf
 
-        <x-ui.forms 
+        <x-ui.form
             label="Correu electrònic" 
             name="email" 
             type="email" 
@@ -19,7 +19,7 @@
         <div>
             <div class="flex justify-between mb-1">
                 <label for="password" class="text-sm font-medium text-text">Contrasenya</label>
-                <a href="{{ route('password.request') }}" class="text-xs text-accent hover:underline font-medium">L'has oblidat?</a>
+                {{-- <a href="{{ route('password.request') }}" class="text-xs text-accent hover:underline font-medium">L'has oblidat?</a> --}}
             </div>
             <input 
                 type="password" 
@@ -35,9 +35,9 @@
             <label for="remember_me" class="ml-2 text-sm text-muted">Recorda'm en aquest dispositiu</label>
         </div>
 
-        <x-ui.buttons type="submit" class="w-full py-3 shadow-sm">
+        <x-ui.button type="submit" class="w-full py-3 shadow-sm">
             Entrar al sistema
-        </x-ui.buttons>
+        </x-ui.button>
     </form>
 
     <div class="mt-8 pt-6 border-t border-border text-center">
