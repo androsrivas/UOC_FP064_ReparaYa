@@ -8,13 +8,15 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Especialidad extends Model
 {
     protected $table = 'especialidades';
-    protected $fillable = ['nombre_especialidad'];
+    protected $fillable = ['nombre_especialidad', 'precio_base'];
 
-    public function tecnicos(): HasMany {
+    public function tecnicos(): HasMany
+    {
         return $this->hasMany(Tecnico::class, 'especialidad_id');
     }
 
-    public function incidencias(): HasMany {
+    public function incidencias(): HasMany
+    {
         return $this->hasMany(Incidencia::class, 'especialidad_id');
     }
 }

@@ -22,37 +22,46 @@ class Incidencia extends Model
         'fecha_servicio',
         'tipo_urgencia',
         'estado',
+        'precio_base',
+        'gstora_id',
     ];
 
     protected $casts = [
         'fecha_servicio' => 'datetime',
     ];
 
-    public function cliente(): BelongsTo {
+    public function cliente(): BelongsTo
+    {
         return $this->belongsTo(User::class, 'cliente_id');
     }
 
-    public function tecnico(): BelongsTo {
+    public function tecnico(): BelongsTo
+    {
         return $this->belongsTo(Tecnico::class, 'tecnico_id');
     }
 
-    public function especialidad(): BelongsTo {
+    public function especialidad(): BelongsTo
+    {
         return $this->belongsTo(Especialidad::class, 'especialidad_id');
     }
 
-    public function zona(): BelongsTo {
+    public function zona(): BelongsTo
+    {
         return $this->belongsTo(Zona::class, 'zona_id');
     }
 
-    public function comision(): HasOne {
+    public function comision(): HasOne
+    {
         return $this->hasOne(Comision::class, 'incidencia_id');
     }
 
-    public function gestora(): BelongsTo {
+    public function gestora(): BelongsTo
+    {
         return $this->belongsTo(Gestora::class, 'gestora_id');
     }
 
-    public function puedeCancelar(): bool {
+    public function puedeCancelar(): bool
+    {
         return $this->fecha_servicio->diffInHours(now()) > 48 && !in_array($this->estado, ['Cancelada', 'Finalizada']);
     }
 }

@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
@@ -13,9 +12,21 @@ class EspecialidadesSeeder extends Seeder
      */
     public function run(): void
     {
-        $especialidades = ['Fontanería', 'Electricidad', 'Carpintería', 'Pintura', 'Climatización', 'Limpieza'];
-        foreach($especialidades as $e) {
-            DB::table('especialidades')->insert(['nombre_especialidad' => $e, 'created_at' => now(), 'updated_at' => now()]);
+        $especialidades = [
+            ['nombre_especialidad' => 'Fontanería', 'precio_base' => 80.00],
+            ['nombre_especialidad' => 'Electricidad', 'precio_base' => 90.00],
+            ['nombre_especialidad' => 'Carpintería', 'precio_base' => 70.00],
+            ['nombre_especialidad' => 'Pintura', 'precio_base' => 60.00],
+            ['nombre_especialidad' => 'Climatización', 'precio_base' => 65.00],
+            ['nombre_especialidad' => 'Limpieza', 'precio_base' => 55.00]
+        ];
+
+        foreach ($especialidades as $e) {
+            DB::table('especialidades')->insert([
+                ...$e, 
+                'created_at' => now(), 
+                'updated_at' => now()
+            ]);
         }
     }
 }
