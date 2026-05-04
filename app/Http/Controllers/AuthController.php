@@ -24,7 +24,7 @@ class AuthController extends Controller
             return redirect()->route('dashboard');
         }
 
-        return back()->withErrors(['email' => 'Credenciales incorrectaas'])->onlyInput('email');
+        return back()->withErrors(['email' => 'Credenciales incorrectas'])->onlyInput('email');
     }
 
     public function showRegister() {
