@@ -63,9 +63,10 @@ class IncidenciaAdminController extends Controller
 
     public function show(Incidencia $incidencia)
     {
-        $incidencia->load(['cliente', 'tecnico', 'especialidad', 'zona', 'comision']);
+        $incidencia->load(['cliente', 'tecnico.especialidad', 'especialidad', 'zona', 'comision']);
+        $tecnicos = Tecnico::with('especialidad')->get();
 
-        return view('incidencias.show', compact('incidencia'));
+        return view('incidencias.show', compact('incidencia', 'tecnicos'));
     }
 
     public function edit(Incidencia $incidencia)
@@ -153,5 +154,28 @@ class IncidenciaAdminController extends Controller
             'mes' => now()->month,
             'anyo' => now()->year,
         ]);
+    }
+
+    public function calendario() 
+    {
+        $incidencias = Incidencia::with(['cliente', 'tecnico', 'especialidad'])
+            ->whereNotIn('estado', ['Cancelada'])
+            ->get()
+            ->map(fn($inc) => [
+                'id' => $inc->id,
+                'localizador' => $inc->localizador,
+                'cliente' => $inc->cliente->nombre,
+                'especialidad' => $inc->especialidad->nombre_especialidad,
+                'fecha_servicio' => $inc->fecha_servicio->toIso8601String(),
+                'fecha_servicio_fmt' => $inc->fecha_servicio->format('d/m/Y H:i'),
+                'direccion' => $inc->direccion,
+                'descripcion' => $inc->descripcion,
+                'tipo_urgencia' => $inc->tipo_urgencia,
+                'estado' => $inc->estado,
+                'tecnico' => $inc->tecnico?->nombre_completo,
+                'url_detall' => route('incidencias.show', $inc->id),    
+            ]);
+
+        return view('incidencias.calendario', compact('incidencias'));
     }
 }

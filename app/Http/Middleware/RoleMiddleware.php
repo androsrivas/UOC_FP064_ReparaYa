@@ -15,7 +15,7 @@ class RoleMiddleware
      */
     public function handle(Request $request, Closure $next, string ...$rol): mixed
     {
-        if (!auth->check() || !in_array(auth()->user()->rol, $rols)) {
+        if (!auth()->check() || !in_array(auth()->user()->rol, $rol)) {
             abort('403', 'Acceso no autorizado.');
         }
         

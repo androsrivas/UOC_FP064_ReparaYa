@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\Incidencia\IncidenciaAdminController;
+use App\Http\Controllers\Incidencia\IncidenciaClienteController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -17,7 +19,10 @@ Route::middleware('guest')->group(function () {
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middleware('auth');
 
 Route::middleware(['auth', 'rol:admin'])->group(function () {
-    
+    Route::get('incidencias/calendario', [IncidenciaAdminController::class, 'calendario'])->name('calendario');
+    Route::resource('incidencias', IncidenciaAdminController::class);
+    Route::patch('incidencias/{incidencia}/asignar-tecnico', [IncidenciaAdminController::class, 'asignarTecnico'])->name('incidencias.asignarTecnico'); 
+    Route::patch('incidencias/{incidencia}/cambiar-estado', [IncidenciaAdminController::class, 'cambiarEstado'])->name('incidencias.cambiarEstado'); 
 });
 
 Route::middleware(['auth', 'rol:tecnico'])->group(function () {
@@ -29,5 +34,8 @@ Route::middleware(['auth', 'rol:gestora'])->group(function () {
 });
 
 Route::middleware(['auth', 'rol:particular'])->group(function () {
-    
+    Route::get('cliente/incidencias', [IncidenciaClienteController::class, 'index'])->name('cliente.incidencias');
+    Route::get('cliente/nueva-incidencia', [IncidenciaClienteController::class, 'create'])->name('cliente.nueva-incidencia');
+    Route::post('cliente/nueva-incidencia', [IncidenciaClienteController::class, 'store'])->name('cliente.store');
+    Route::delete('cliente/incidencias/{incidencia}', [IncidenciaClienteController::class, 'cancelar'])->name('cliente.cancelar');
 });
