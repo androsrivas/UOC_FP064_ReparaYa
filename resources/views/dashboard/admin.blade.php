@@ -1,5 +1,5 @@
 <x-layouts.base>
-    <x-slot name="title">Panel de Administración — ReparaYa</x-slot>
+     <x-slot name="title">Panel de Administración — ReparaYa</x-slot>
 
     <div class="flex min-h-screen bg-slate-50 font-sans">
         
@@ -12,6 +12,8 @@
                     ReparaYa
                 </a>
             </div>
+
+            <x-navigation.sidebar />
             
             <nav class="flex flex-1 flex-col gap-2 p-4">
                 <a href="{{ route('dashboard') }}" class="flex items-center gap-3 rounded-lg bg-blue-50 px-4 py-2.5 text-sm font-medium text-blue-700 transition-colors">
