@@ -6,6 +6,8 @@
             <h1 class="text-2xl font-semibold text-gray-800">Nueva incidencia</h1>
         </div>
 
+        <x-ui.alert-msg />
+
         <form method="POST" action="{{ route('incidencias.store') }}"
               class="bg-white rounded-xl border border-gray-200 p-6">
             @csrf
