@@ -9,7 +9,7 @@
     </div>
 
     <form method="GET" class="flex gap-3 mb-6 flex-wrap">
-        <select name="estat" class="border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+        <select name="estado" class="border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
             <option value="">Todos los estados</option>
             @foreach(['Pendiente','Asignada','Finalizada','Cancelada'] as $e)
                 <option value="{{ $e }}" {{ request('estado') == $e ? 'selected' : '' }}>
@@ -136,7 +136,7 @@
     </div>
 
     <div class="mt-4">
-        {{ $incidencias->withQueryString()->links() }}
+        {{ $incidencias->links() }}
     </div>
 
-</x-layouts.admin>
+</x-layouts.base>
