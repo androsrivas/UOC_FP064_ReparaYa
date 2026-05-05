@@ -1,4 +1,4 @@
-<x-layouts.base title="Editar incidència">
+<x-layouts.base title="Editar incidencia">
     <div class="max-w-3xl">
         <div class="flex items-center gap-3 mb-6">
             <a href="{{ route('incidencias.show', $incidencia) }}"
@@ -10,6 +10,8 @@
                 <p class="text-sm text-gray-400 mt-0.5">{{ $incidencia->localizador }}</p>
             </div>
         </div>
+
+        <x-ui.alert-msg />
 
         <form method="POST" action="{{ route('incidencias.update', $incidencia) }}"
               class="bg-white rounded-xl border border-gray-200 p-6">
