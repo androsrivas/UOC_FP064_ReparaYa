@@ -57,19 +57,19 @@
             <div class="mb-8 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
                 <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
                     <div class="mb-2 text-sm text-slate-500">Incidencias de hoy</div>
-                    <div class="font-serif text-3xl leading-none text-blue-950">{{  }}</div>
+                    <div class="font-serif text-3xl leading-none text-blue-950">{{ $incidencias_hoy }}</div>
                 </div>
                 <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
                     <div class="mb-2 text-sm text-slate-500">Pendientes de Asignar</div>
-                    <div class="font-serif text-3xl leading-none text-orange-600">{{ }}</div>
+                    <div class="font-serif text-3xl leading-none text-orange-600">{{ $pendientes_asignar }}</div>
                 </div>
                 <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
                     <div class="mb-2 text-sm text-slate-500">Técnicos Activos</div>
-                    <div class="font-serif text-3xl leading-none text-blue-950">{{  }}</div>
+                    <div class="font-serif text-3xl leading-none text-blue-950">{{ $tecnicos_activos }}</div>
                 </div>
                 <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
                     <div class="mb-2 text-sm text-slate-500">Resueltas este mes</div>
-                    <div class="font-serif text-3xl leading-none text-teal-600">{{  }}</div>
+                    <div class="font-serif text-3xl leading-none text-teal-600">{{ $resueltas_mes }}</div>
                 </div>
             </div>
 
