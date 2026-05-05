@@ -25,12 +25,18 @@ class DashboardController extends Controller
             default => 'dashboard.particular',
         };
 
-        return view($vista);
+        $data = match($user->rol) {
+            'admin' => $this->getAdminData($user),
+            'tecnico' => $this->getTecnicoData($user),
+            default => ['ultimas_incidencias' => $this->getUltimasIncidencias($user)],
+        };
+
+        return view($vista, $data);
     }
 
-    public function getultimasIncidencias(User $user)
+    public function getUltimasIncidencias(User $user)
     {
-        $query = Incidencia::with(['user', 'especialidad', 'tecnico', 'estado', 'gestora']);
+        $query = Incidencia::with(['cliente', 'especialidad', 'tecnico', 'gestora']);
 
         if ($user->rol === 'tecnico') {
             $query->where('tecnico_id', $user->id);
@@ -44,11 +50,11 @@ class DashboardController extends Controller
     }
 
     public function getAdminData(User $user): array {
-        $ultimas_incidencias = $this->getultimasIncidencias($user);
+        $ultimas_incidencias = $this->getUltimasIncidencias($user);
         $incidencias_hoy = Incidencia::whereDate('created_at', Carbon::today())->count();
         $pendientes_asignar = Incidencia::where('estado', 'Pendiente')->count();
         $tecnicos_activos = Tecnico::where('disponible', true)->count();
-        $resultas_mes = Incidencia::where('estado', 'Finalizada')
+        $resueltas_mes = Incidencia::where('estado', 'Finalizada')
             ->whereMonth('updated_at', Carbon::now()->month)
             ->whereYear('updated_at', Carbon::now()->year)
             ->count();
@@ -58,12 +64,12 @@ class DashboardController extends Controller
             'incidencias_hoy' => $incidencias_hoy,
             'pendientes_asignar' => $pendientes_asignar,
             'tecnicos_activos' => $tecnicos_activos,
-            'resultas_mes' => $resultas_mes
+            'resueltas_mes' => $resueltas_mes
         ];
     }
 
     public function getTecnicoData(User $user): array {
-        $ultimas_incidencias = $this->getultimasIncidencias($user);
+        $ultimas_incidencias = $this->getUltimasIncidencias($user);
         $pendientes_hoy = Incidencia::where('tecnico_id', $user->id)
             ->where('estado', 'Pendiente')
             ->whereDate('created_at', Carbon::today())
