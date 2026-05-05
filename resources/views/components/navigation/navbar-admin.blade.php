@@ -8,7 +8,6 @@
     <div class="flex items-center gap-3">
         <div class="text-right">
             <p class="text-sm font-medium text-gray-800">{{ auth()->user()->nombre }}</p>
-            <p class="text-xs text-gray-400 capitalize">{{ auth()->user()->rol }}</p>
         </div>
         <div class="w-9 h-9 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold text-sm">
             {{ strtoupper(substr(auth()->user()->nombre, 0, 1)) }}
