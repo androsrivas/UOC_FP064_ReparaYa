@@ -11,9 +11,17 @@
 </head>
 <body class="bg-gray-100 text-gray-800 min-h-screen">
 
-    <x-navigation.navbar-admin />
-    {{ $slot }}
+    <div class="min-h-screen bg-gray-50">
 
-    {{ $scripts ?? '' }}
+    <div class="lg:pl-64 flex flex-col min-h-screen">
+        <x-navbar :breadcrumbItems="$breadcrumbItems ?? []">
+            {{ $navbar_extra ?? '' }}
+        </x-navbar>
+
+        <main class="p-6 flex-1">
+            {{ $slot }}
+        </main>
+    </div>
+</div>
 </body>
 </html>
