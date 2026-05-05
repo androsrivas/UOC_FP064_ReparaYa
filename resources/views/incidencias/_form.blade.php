@@ -8,11 +8,16 @@
         <label class="block text-sm font-medium text-gray-700 mb-1">
             Email del cliente *
         </label>
-        <input type="email" name="cliente_email"
+        <input type="email" name="email"
+               id="email" list="clientes-list"
                placeholder="email@exemple.com"
                value="{{ old('cliente_email') }}"
                class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm 
                       focus:outline-none focus:ring-2 focus:ring-blue-500">
+        <datalist id="clientes-list">
+            @foreach($clientes as $cliente)
+                <option value="{{ $cliente->email }}">{{ $cliente->nombre_completo }}</option>
+            @endforeach
         @error('cliente_id')
             <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
         @enderror
@@ -39,26 +44,7 @@
         @enderror
     </div>
 
-    {{-- Zona --}}
-    <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">Zona *</label>
-        <select name="zona_id"
-                class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm 
-                       focus:outline-none focus:ring-2 focus:ring-blue-500">
-            <option value="">Selecciona...</option>
-            @foreach($zonas as $zona)
-                <option value="{{ $zona->id }}"
-                    {{ old('zona_id', $incidencia->zona_id ?? '') == $zona->id ? 'selected' : '' }}>
-                    {{ $zona->nombre }}
-                </option>
-            @endforeach
-        </select>
-        @error('zona_id')
-            <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
-        @enderror
-    </div>
-
-    {{-- Fecha y hora --}}
+        {{-- Fecha y hora --}}
     <div>
         <label class="block text-sm font-medium text-gray-700 mb-1">Fecha del servicio *</label>
         <input type="datetime-local" name="fecha_servicio"
@@ -70,7 +56,7 @@
         @enderror
     </div>
 
-    {{-- Urgencia --}}
+        {{-- Urgencia --}}
     <div>
         <label class="block text-sm font-medium text-gray-700 mb-1">Urgencia *</label>
         <select name="tipo_urgencia"
@@ -90,6 +76,25 @@
         @enderror
     </div>
 
+    {{-- Zona --}}
+    <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Zona *</label>
+        <select name="zona_id"
+                class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm 
+                       focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <option value="">Selecciona...</option>
+            @foreach($zonas as $zona)
+                <option value="{{ $zona->id }}"
+                    {{ old('zona_id', $incidencia->zona_id ?? '') == $zona->id ? 'selected' : '' }}>
+                    {{ $zona->nombre }}
+                </option>
+            @endforeach
+        </select>
+        @error('zona_id')
+            <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+        @enderror
+    </div>
+
     {{-- Dirección --}}
     <div class="col-span-2">
         <label class="block text-sm font-medium text-gray-700 mb-1">Dirección *</label>
@@ -99,6 +104,24 @@
                class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm 
                       focus:outline-none focus:ring-2 focus:ring-blue-500">
         @error('direccion')
+            <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+        @enderror
+        <label class="block text-sm font-medium text-gray-700 mb-1">Población *</label>
+        <input type="text" name="poblacion"
+               value="{{ old('poblacion', $incidencia->poblacion ?? '') }}"
+               placeholder="Población..."
+               class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm 
+                      focus:outline-none focus:ring-2 focus:ring-blue-500">
+        @error('poblacion')
+            <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+        @enderror
+        <label class="block text-sm font-medium text-gray-700 mb-1">Código postal *</label>
+        <input type="text" name="codigo_postal"
+               value="{{ old('codigo_postal', $incidencia->codigo_postal ?? '') }}"
+               placeholder="Código postal..."
+               class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm 
+                      focus:outline-none focus:ring-2 focus:ring-blue-500">
+        @error('codigo_postal')
             <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
         @enderror
     </div>
