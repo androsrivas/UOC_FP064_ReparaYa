@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use App\Models\Especialidad;
 use App\Models\Incidencia;
 use App\Models\Tecnico;
+use App\Models\User;
 use App\Models\Zona;
 
 class IncidenciaAdminController extends Controller
@@ -19,24 +20,28 @@ class IncidenciaAdminController extends Controller
             ->when($request->urgencia, fn($q, $v) => $q->where('tipo_urgencia', $v))
             ->when($request->especialidad, fn($q, $v) => $q->where('especialidad_id', $v))
             ->orderByDesc('created_at')
-            ->paginate(15);
+            ->paginate(15)
+            ->withQueryString();
 
-        $especialdiades = Especialidad::all();
+        $especialidades = Especialidad::all();
 
-        return view('incidencias.index', compact('incidencias', 'especialdiades'));
+        return view('incidencias.index', compact('incidencias', 'especialidades'));
     }
 
     public function create()
     {
+        $clientes = User::select('email')->get();
         $especialidades = Especialidad::all();
         $zonas = Zona::all();
         $tecnicos = Tecnico::with('especialidad')->where('disponible', true)->get();
 
-        return view('incidencias.create', compact('especialidades', 'zonas', 'tecnicos'));
+        return view('incidencias.create', compact('clientes', 'especialidades', 'zonas', 'tecnicos'));
     }
 
     public function store(Request $request)
     {
+        // dd( $request->all() );
+
         $data = $request->validate([
             'especialidad_id' => 'required|exists:especialidades,id',
             'zona_id' => 'required|exists:zonas,id',
@@ -47,14 +52,19 @@ class IncidenciaAdminController extends Controller
             'fecha_servicio' => 'required|date|after:now',
             'tipo_urgencia' => 'required|in:Estándar,Urgente',
             'tecnico_id' => 'nullable|exists:tecnicos,id',
-            'cliente_id' => 'required|exists:usuarios,id',
+            'email' => 'required|email|exists:usuarios,email',
+            'precio_base' => 'required|numeric|min:0',
         ]);
 
+        $cliente = User::where('email', $data['email'])->first();
         $especialidad = Especialidad::find($data['especialidad_id']);
 
+        $data['cliente_id'] = $cliente->id;
         $data['localizador'] = $this->generarLocalizador();
         $data['estado'] = $data['tecnico_id'] ? 'Asignada' : 'Pendiente';
         $data['precio_base'] = $especialidad->precio_base;
+        
+        unset($data['email']);
 
         Incidencia::create($data);
 
@@ -80,7 +90,7 @@ class IncidenciaAdminController extends Controller
 
     public function update(Request $request, Incidencia $incidencia)
     {
-         $data = $request->validate([
+        $data = $request->validate([
             'especialidad_id' => 'required|exists:especialidades,id',
             'zona_id' => 'required|exists:zonas,id',
             'descripcion' => 'required|string|max:1000',
@@ -89,6 +99,8 @@ class IncidenciaAdminController extends Controller
             'codigo_postal' => 'required|string|max:5',
             'fecha_servicio' => 'required|date|after:now',
             'tipo_urgencia' => 'required|in:Estándar,Urgente',
+            'precio_base' => 'required|numeric|min:0',
+            'tecnico_id' => 'nullable|exists:tecnicos,id',
         ]);
 
         $incidencia->update($data);
