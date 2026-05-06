@@ -42,7 +42,8 @@ Route::middleware(['auth', 'rol:gestora'])->group(function () {
 // Rutas para particular
 Route::middleware(['auth', 'rol:particular'])->group(function () {
     Route::get('cliente/incidencias', [IncidenciaClienteController::class, 'index'])->name('cliente.incidencias');
-    Route::get('cliente/nueva-incidencia', [IncidenciaClienteController::class, 'create'])->name('cliente.nueva-incidencia');
-    Route::post('cliente/nueva-incidencia', [IncidenciaClienteController::class, 'store'])->name('cliente.store');
-    Route::delete('cliente/incidencias/{incidencia}', [IncidenciaClienteController::class, 'cancelar'])->name('cliente.cancelar');
+    Route::get('cliente/nueva-incidencia', [IncidenciaClienteController::class, 'create'])->name('cliente.incidencias.nueva-incidencia');
+    Route::post('cliente/nueva-incidencia', [IncidenciaClienteController::class, 'store'])->name('cliente.incidencias.store');
+    Route::get('cliente/incidencias/{incidencia}', [IncidenciaClienteController::class, 'show'])->name('cliente.incidencias.show');
+    Route::delete('cliente/incidencias/{incidencia}', [IncidenciaClienteController::class, 'cancelar'])->name('cliente.incidencias.cancelar');
 });
