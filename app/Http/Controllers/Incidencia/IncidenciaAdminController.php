@@ -11,6 +11,8 @@ use App\Models\Incidencia;
 use App\Models\Tecnico;
 use App\Models\User;
 use App\Models\Zona;
+use App\Http\Requests\Incidencia\StoreIncidenciaRequest;
+use App\Http\Requests\Incidencia\UpdateIncidenciaRequest;
 
 class IncidenciaAdminController extends Controller
 {
@@ -43,26 +45,9 @@ class IncidenciaAdminController extends Controller
         return view('incidencias.create', compact('clientes', 'especialidades', 'zonas', 'tecnicos'));
     }
 
-    public function store(Request $request)
+    public function store(StoreIncidenciaRequest $request)
     {
-        // dd( $request->all() );
-
-        Gate::authorize('create', Incidencia::class);
-
-        $data = $request->validate([
-            'especialidad_id' => 'required|exists:especialidades,id',
-            'zona_id' => 'required|exists:zonas,id',
-            'titulo' => 'nullable|string|max:255',
-            'descripcion' => 'required|string|max:1000',
-            'direccion' => 'required|string|max:255',
-            'poblacion' => 'required|string|max:100',
-            'codigo_postal' => 'required|string|max:5',
-            'fecha_servicio' => 'required|date|after:now',
-            'tipo_urgencia' => 'required|in:Estándar,Urgente',
-            'tecnico_id' => 'nullable|exists:tecnicos,id',
-            'email' => 'required|email|exists:usuarios,email',
-            'precio_base' => 'required|numeric|min:0',
-        ]);
+        $data = $request->validated();
 
         $cliente = User::where('email', $data['email'])->first();
         $especialidad = Especialidad::find($data['especialidad_id']);
@@ -100,23 +85,9 @@ class IncidenciaAdminController extends Controller
         return view('incidencias.edit', compact('incidencia', 'especialidades', 'zonas', 'tecnicos'));
     }
 
-    public function update(Request $request, Incidencia $incidencia)
+    public function update(UpdateIncidenciaRequest $request, Incidencia $incidencia)
     {
-        Gate::authorize('update', $incidencia);
-
-        $data = $request->validate([
-            'especialidad_id' => 'required|exists:especialidades,id',
-            'zona_id' => 'required|exists:zonas,id',
-            'titulo' => 'nullable|string|max:255',
-            'descripcion' => 'required|string|max:1000',
-            'direccion' => 'required|string|max:255',
-            'poblacion' => 'required|string|max:100',
-            'codigo_postal' => 'required|string|max:5',
-            'fecha_servicio' => 'required|date|after:now',
-            'tipo_urgencia' => 'required|in:Estándar,Urgente',
-            'precio_base' => 'required|numeric|min:0',
-            'tecnico_id' => 'nullable|exists:tecnicos,id',
-        ]);
+        $data = $request->validated();
 
         $incidencia->update($data);
 
@@ -176,10 +147,10 @@ class IncidenciaAdminController extends Controller
 
     private function generarComision(Incidencia $incidencia)
     {
-        $gestora = $incidencia->gestora;
+        $gestora = $incidencia->gestora_id;
 
         Comision::create([
-            'gestora_id' => $gestora->id,
+            'gestora_id' => $gestora,
             'incidencia_id' => $incidencia->id,
             'precio_base' => $incidencia->precio_base,
             'porcentaje_aplicado' => $gestora->porcentaje_comision,
