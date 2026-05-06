@@ -66,7 +66,7 @@ class IncidenciaClienteController extends Controller
     public function cancel(Incidencia $incidencia) 
     {
         if ($incidencia->cliente_id !== auth()->id()) {
-            abort(403);
+            abort(403, 'No tienes permiso para cancelar esta incidencia.');
         }
 
         if (!$incidencia->puedeCancelar()) {
@@ -76,7 +76,7 @@ class IncidenciaClienteController extends Controller
 
         $incidencia->update(['estado' => 'Cancelada']);
 
-        return back()->with('success', 'Incidencia cancelada correctamente.');
+        return redirect()->route('client.incidencias')->with('success', 'Incidencia cancelada correctamente.');
     }
 
     private function generarLocalizador()
