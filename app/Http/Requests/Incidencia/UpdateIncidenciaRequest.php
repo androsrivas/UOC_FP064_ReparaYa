@@ -4,6 +4,9 @@ namespace App\Http\Requests\Incidencia;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use App\Models\Incidencia;
+use Illuminate\Support\Facades\Gate;
+use App\Rules\FechaServicioValida;
 
 class UpdateIncidenciaRequest extends FormRequest
 {
@@ -30,7 +33,7 @@ class UpdateIncidenciaRequest extends FormRequest
             'direccion'       => 'required|string|max:255',
             'poblacion'       => 'required|string|max:100',
             'codigo_postal'   => 'required|string|max:5',
-            'fecha_servicio'  => 'required|date|after:now',
+            'fecha_servicio'  => ['required', 'date', new FechaServicioValida()],
             'tipo_urgencia'   => 'required|in:Estándar,Urgente',
             'precio_base'     => 'required|numeric|min:0',
             'tecnico_id'      => 'nullable|exists:tecnicos,id',
@@ -58,6 +61,14 @@ class UpdateIncidenciaRequest extends FormRequest
             'codigo_postal.required' => 'El código postal es obligatorio.',
             'codigo_postal.string' => 'El código postal debe ser una cadena de texto.',
             'codigo_postal.max' => 'El código postal no puede exceder los 5 caracteres.',
+            'fecha_servicio.required' => 'La fecha de servicio es obligatoria.',
+            'fecha_servicio.date' => 'La fecha de servicio debe ser una fecha válida.',
+            'tipo_urgencia.required' => 'El tipo de urgencia es obligatorio.',
+            'tipo_urgencia.in' => 'El tipo de urgencia debe ser Estándar o Urgente.',
+            'precio_base.required' => 'El precio base es obligatorio.',
+            'precio_base.numeric' => 'El precio base debe ser un número válido.',
+            'precio_base.min' => 'El precio base no puede ser negativo.',
+            'tecnico_id.exists' => 'El técnico seleccionado no es válido.',
         ];
     }
 }
