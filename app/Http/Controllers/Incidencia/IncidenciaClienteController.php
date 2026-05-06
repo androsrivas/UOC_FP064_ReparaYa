@@ -26,7 +26,18 @@ class IncidenciaClienteController extends Controller
         $especialidades = Especialidad::all();
         $zonas = Zona::all();
 
-        return view('cliente.nueva', compact('especialidades', 'zonas'));
+        return view('cliente.nueva-incidencia', compact('especialidades', 'zonas'));
+    }
+
+    public function show(Incidencia $incidencia)
+    {
+        if ($incidencia->cliente_id !== auth()->id()) {
+            abort(403, 'No tienes permiso para ver esta incidencia.');
+        }
+
+        $incidencia->load(['especialidad', 'tecnico', 'gestora', 'zona']);
+
+        return view('incidencias.show', compact('incidencia'));
     }
 
     public function store(Request $request)
@@ -76,7 +87,7 @@ class IncidenciaClienteController extends Controller
 
         $incidencia->update(['estado' => 'Cancelada']);
 
-        return redirect()->route('client.incidencias')->with('success', 'Incidencia cancelada correctamente.');
+        return redirect()->route('cliente.incidencias')->with('success', 'Incidencia cancelada correctamente.');
     }
 
     private function generarLocalizador()
