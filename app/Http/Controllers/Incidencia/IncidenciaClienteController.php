@@ -8,6 +8,7 @@ use App\Models\Incidencia;
 use App\Models\Zona;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 
 class IncidenciaClienteController extends Controller
 {
@@ -23,6 +24,8 @@ class IncidenciaClienteController extends Controller
 
     public function create()
     {
+        Gate::authorize('create', Incidencia::class);
+
         $especialidades = Especialidad::all();
         $zonas = Zona::all();
 
@@ -31,17 +34,15 @@ class IncidenciaClienteController extends Controller
 
     public function show(Incidencia $incidencia)
     {
-        if ($incidencia->cliente_id !== auth()->id()) {
-            abort(403, 'No tienes permiso para ver esta incidencia.');
-        }
-
-        $incidencia->load(['especialidad', 'tecnico', 'gestora', 'zona']);
+        Gate::authorize('view', $incidencia);
 
         return view('incidencias.show', compact('incidencia'));
     }
 
     public function store(Request $request)
     {
+        Gate::authorize('create', Incidencia::class);
+        
         $data = $request->validate([
             'especialidad_id' => 'required|exists:especialidades,id',
             'zona_id' => 'required|exists:zonas,id',
@@ -76,9 +77,7 @@ class IncidenciaClienteController extends Controller
 
     public function cancel(Incidencia $incidencia) 
     {
-        if ($incidencia->cliente_id !== auth()->id()) {
-            abort(403, 'No tienes permiso para cancelar esta incidencia.');
-        }
+        Gate::authorize('cancel', $incidencia);
 
         if (!$incidencia->puedeCancelar()) {
             return back()->with('error', 
