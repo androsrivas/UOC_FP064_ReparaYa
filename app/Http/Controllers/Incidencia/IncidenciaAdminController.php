@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Incidencia;
 use App\Http\Controllers\Controller;
 use App\Models\Comision;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use App\Models\Especialidad;
 use App\Models\Incidencia;
 use App\Models\Tecnico;
@@ -15,6 +16,8 @@ class IncidenciaAdminController extends Controller
 {
     public function index(Request $request)
     {
+        Gate::authorize('viewAny', Incidencia::class);
+
         $incidencias = Incidencia::with(['cliente', 'tecnico', 'especialidad', 'zona'])
             ->when($request->estado, fn($q, $v) => $q->where('estado', $v))
             ->when($request->urgencia, fn($q, $v) => $q->where('tipo_urgencia', $v))
@@ -30,6 +33,8 @@ class IncidenciaAdminController extends Controller
 
     public function create()
     {
+        Gate::authorize('create', Incidencia::class);
+
         $clientes = User::select('email')->get();
         $especialidades = Especialidad::all();
         $zonas = Zona::all();
@@ -41,6 +46,8 @@ class IncidenciaAdminController extends Controller
     public function store(Request $request)
     {
         // dd( $request->all() );
+
+        Gate::authorize('create', Incidencia::class);
 
         $data = $request->validate([
             'especialidad_id' => 'required|exists:especialidades,id',
@@ -74,6 +81,8 @@ class IncidenciaAdminController extends Controller
 
     public function show(Incidencia $incidencia)
     {
+        Gate::authorize('view', $incidencia);
+
         $incidencia->load(['cliente', 'tecnico.especialidad', 'especialidad', 'zona', 'comision']);
         $tecnicos = Tecnico::with('especialidad')->get();
 
@@ -82,6 +91,8 @@ class IncidenciaAdminController extends Controller
 
     public function edit(Incidencia $incidencia)
     {
+        Gate::authorize('update', $incidencia);
+
         $especialidades = Especialidad::all();
         $zonas = Zona::all();
         $tecnicos = Tecnico::with('especialidad')->get();
@@ -91,6 +102,8 @@ class IncidenciaAdminController extends Controller
 
     public function update(Request $request, Incidencia $incidencia)
     {
+        Gate::authorize('update', $incidencia);
+
         $data = $request->validate([
             'especialidad_id' => 'required|exists:especialidades,id',
             'zona_id' => 'required|exists:zonas,id',
@@ -112,6 +125,8 @@ class IncidenciaAdminController extends Controller
 
     public function destroy(Incidencia $incidencia)
     {
+        Gate::authorize('delete', $incidencia);
+
         $incidencia->update(['estado' => 'Cancelada']);
 
         return redirect()->route('incidencias.index')->with('success', 'Incidencia eliminada exitosamente.');
@@ -119,6 +134,8 @@ class IncidenciaAdminController extends Controller
 
     public function asignarTecnico(Request $request, Incidencia $incidencia)
     {
+        Gate::authorize('assign', $incidencia);
+
         $request->validate([
             'tecnico_id' => 'required|exists:tecnicos,id',
         ]);
@@ -133,6 +150,8 @@ class IncidenciaAdminController extends Controller
 
     public function cambiarEstado(Request $request, Incidencia $incidencia)
     {
+        Gate::authorize('changeStatus', $incidencia);
+
         $request->validate([
             'estado' => 'required|in:Pendiente,Asignada,Finalizada,Cancelada',
         ]);
@@ -172,6 +191,8 @@ class IncidenciaAdminController extends Controller
 
     public function calendario() 
     {
+        Gate::authorize('viewAny', Incidencia::class);
+
         $incidencias = Incidencia::with(['cliente', 'tecnico', 'especialidad'])
             ->whereNotIn('estado', ['Cancelada'])
             ->get()
