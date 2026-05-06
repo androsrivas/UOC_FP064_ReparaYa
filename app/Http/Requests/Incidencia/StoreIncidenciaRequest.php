@@ -4,6 +4,9 @@ namespace App\Http\Requests\Incidencia;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use App\Models\Incidencia;
+use Illuminate\Support\Facades\Gate;
+use App\Rules\FechaServicioValida;
 
 class StoreIncidenciaRequest extends FormRequest
 {
@@ -30,7 +33,7 @@ class StoreIncidenciaRequest extends FormRequest
             'direccion' => 'required|string|max:255',
             'poblacion' => 'required|string|max:100',
             'codigo_postal' => 'required|string|max:5',
-            'fecha_servicio' => 'required|date|after:now',
+            'fecha_servicio' => ['required', 'date', new FechaServicioValida()],
             'tipo_urgencia' => 'required|in:Estándar,Urgente',
             'precio_base' => 'required|numeric|min:0',
             'tecnico_id' => 'nullable|exists:tecnicos,id',
@@ -60,7 +63,6 @@ class StoreIncidenciaRequest extends FormRequest
             'codigo_postal.max' => 'El código postal no puede exceder los 5 caracteres.',
             'fecha_servicio.required' => 'La fecha del servicio es obligatoria.',
             'fecha_servicio.date' => 'La fecha del servicio debe ser una fecha válida.',
-            'fecha_servicio.after' => 'La fecha del servicio debe ser posterior a la fecha actual.',
             'tipo_urgencia.required' => 'El tipo de urgencia es obligatorio.',
             'tipo_urgencia.in' => 'El tipo de urgencia seleccionado no es válido. Debe ser "Estándar" o "Urgente".',
             'precio_base.required' => 'El precio base es obligatorio.',
