@@ -45,6 +45,7 @@ class IncidenciaAdminController extends Controller
         $data = $request->validate([
             'especialidad_id' => 'required|exists:especialidades,id',
             'zona_id' => 'required|exists:zonas,id',
+            'titulo' => 'nullable|string|max:255',
             'descripcion' => 'required|string|max:1000',
             'direccion' => 'required|string|max:255',
             'poblacion' => 'required|string|max:100',
@@ -93,6 +94,7 @@ class IncidenciaAdminController extends Controller
         $data = $request->validate([
             'especialidad_id' => 'required|exists:especialidades,id',
             'zona_id' => 'required|exists:zonas,id',
+            'titulo' => 'nullable|string|max:255',
             'descripcion' => 'required|string|max:1000',
             'direccion' => 'required|string|max:255',
             'poblacion' => 'required|string|max:100',
