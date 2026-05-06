@@ -83,18 +83,23 @@ class DashboardController extends Controller
     }
 
     public function getParticularData(User $user): array {
-        $incidencias_activas = Incidencia::where('user_id', $user->id)->whereIn('estado', ['Pendiente', 'En Proceso'])->count();
-        $pendientes_visita = Incidencia::where('user_id', $user->id)->where('estado', 'Pendiente')->count();
-        $finalizadas_mes = Incidencia::where('user_id', $user->id)
+        $incidencias_activas = Incidencia::where('cliente_id', $user->id)->whereIn('estado', ['Pendiente', 'Asignada'])->count();
+        $pendientes_visita = Incidencia::where('cliente_id', $user->id)->where('estado', 'Pendiente')->count();
+        $finalizadas_mes = Incidencia::where('cliente_id', $user->id)
             ->where('estado', 'Finalizada')
             ->whereMonth('updated_at', Carbon::now()->month)
             ->whereYear('updated_at', Carbon::now()->year)
             ->count();
+        $incidencias = Incidencia::where('cliente_id', $user->id)
+            ->orderBy('created_at', 'desc')
+            ->take(5)
+            ->get();
 
         return [
             'incidencias_activas' => $incidencias_activas,
             'pendientes_visita' => $pendientes_visita,
-            'finalizadas_mes' => $finalizadas_mes
+            'finalizadas_mes' => $finalizadas_mes,
+            'incidencias' => $incidencias
         ];
     }
 
