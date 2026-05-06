@@ -28,7 +28,8 @@ class DashboardController extends Controller
         $data = match($user->rol) {
             'admin' => $this->getAdminData($user),
             'tecnico' => $this->getTecnicoData($user),
-            default => ['ultimas_incidencias' => $this->getUltimasIncidencias($user)],
+            'gestora' => $this->getGestoraData($user),
+            default => $this->getParticularData($user),
         };
 
         return view($vista, $data);
@@ -78,6 +79,34 @@ class DashboardController extends Controller
         return [
             'ultimas_incidencias' => $ultimas_incidencias,
             'pendientes_hoy' => $pendientes_hoy
+        ];
+    }
+
+    public function getParticularData(User $user): array {
+        $incidencias_activas = Incidencia::where('user_id', $user->id)->whereIn('estado', ['Pendiente', 'En Proceso'])->count();
+        $pendientes_visita = Incidencia::where('user_id', $user->id)->where('estado', 'Pendiente')->count();
+        $finalizadas_mes = Incidencia::where('user_id', $user->id)
+            ->where('estado', 'Finalizada')
+            ->whereMonth('updated_at', Carbon::now()->month)
+            ->whereYear('updated_at', Carbon::now()->year)
+            ->count();
+
+        return [
+            'incidencias_activas' => $incidencias_activas,
+            'pendientes_visita' => $pendientes_visita,
+            'finalizadas_mes' => $finalizadas_mes
+        ];
+    }
+
+    public function getGestoraData(User $user): array {
+        $ultimas_incidencias = $this->getUltimasIncidencias($user);
+        $pendientes_asignar = Incidencia::where('gestora_id', $user->id)
+            ->where('estado', 'Pendiente')
+            ->count();
+
+        return [
+            'ultimas_incidencias' => $ultimas_incidencias,
+            'pendientes_asignar' => $pendientes_asignar
         ];
     }
 }
