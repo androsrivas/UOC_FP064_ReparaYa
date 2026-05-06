@@ -22,16 +22,6 @@ class IncidenciaClienteController extends Controller
         return view('cliente.incidencias', compact('incidencias'));
     }
 
-    public function create()
-    {
-        Gate::authorize('create', Incidencia::class);
-
-        $especialidades = Especialidad::all();
-        $zonas = Zona::all();
-
-        return view('cliente.nueva-incidencia', compact('especialidades', 'zonas'));
-    }
-
     public function show(Incidencia $incidencia)
     {
         Gate::authorize('view', $incidencia);
@@ -39,31 +29,21 @@ class IncidenciaClienteController extends Controller
         return view('incidencias.show', compact('incidencia'));
     }
 
-    public function store(Request $request)
+    public function create()
+    {
+        Gate::authorize('create', Incidencia::class);
+
+        $especialidades = Especialidad::all();
+        $zonas = Zona::all();
+
+        return view('incidencias.create', compact('especialidades', 'zonas'));
+    }
+
+    public function store(StoreIncidenciaRequest $request)
     {
         Gate::authorize('create', Incidencia::class);
         
-        $data = $request->validate([
-            'especialidad_id' => 'required|exists:especialidades,id',
-            'zona_id' => 'required|exists:zonas,id',
-            'descripcion' => 'required|string|max:1000',
-            'direccion' => 'required|string|max:255',
-            'poblacion' => 'required|string|max:100',
-            'codigo_postal' => 'required|string|max:5',
-            'fecha_servicio' => [
-                'required',
-                'date',
-                function ($attribute, $value, $fail) use ($request) {
-                    $fecha = Carbon::parse($value);
-                    $minHoras = $request->tipo_urgencia === 'Urgente' ? 0 : 48;
-
-                    if ($fecha->diffInHours(now(), false) > -$minHoras) {
-                        $fail('El servicio estándar necesita al menos 48 horas de antelación.');
-                    }
-                }
-            ],
-            'tipo_urgencia' => 'required|in:Estándar,Urgente',
-        ]);
+        $data = $request->validated();
 
         $data['cliente_id'] = auth()->id();
         $data['estado'] = 'Pendiente';
