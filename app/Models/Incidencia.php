@@ -63,6 +63,9 @@ class Incidencia extends Model
 
     public function puedeCancelar(): bool
     {
-        return $this->fecha_servicio->diffInHours(now()) > 48 && !in_array($this->estado, ['Cancelada', 'Finalizada']);
+        $conSuficienteAntelacion = now()->addHours(48)->isBefore($this->fecha_servicio);
+        $estadoValido = !in_array($this->estado, ['Cancelada', 'Asignada', 'Finalizada']);
+
+        return $conSuficienteAntelacion && $estadoValido;
     }
 }
