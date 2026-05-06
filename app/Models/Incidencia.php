@@ -15,6 +15,7 @@ class Incidencia extends Model
         'tecnico_id',
         'especialidad_id',
         'zona_id',
+        'titulo',
         'descripcion',
         'direccion',
         'poblacion',
