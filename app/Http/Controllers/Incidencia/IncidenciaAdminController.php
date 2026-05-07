@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Incidencia;
 
 use App\Http\Controllers\Controller;
-use App\Models\Comision;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use App\Models\Especialidad;
@@ -13,9 +12,17 @@ use App\Models\User;
 use App\Models\Zona;
 use App\Http\Requests\Incidencia\StoreIncidenciaRequest;
 use App\Http\Requests\Incidencia\UpdateIncidenciaRequest;
+use App\Services\IncidenciaService;
 
 class IncidenciaAdminController extends Controller
 {
+    protected IncidenciaService $incidenciaService;
+
+    public function __construct(IncidenciaService $incidenciaService)
+    {
+        $this->incidenciaService = $incidenciaService;
+    }
+
     public function index(Request $request)
     {
         Gate::authorize('viewAny', Incidencia::class);
@@ -53,15 +60,15 @@ class IncidenciaAdminController extends Controller
         $especialidad = Especialidad::find($data['especialidad_id']);
 
         $data['cliente_id'] = $cliente->id;
-        $data['localizador'] = $this->generarLocalizador();
+        $data['localizador'] = $this->incidenciaService->generarLocalizador();
         $data['estado'] = $data['tecnico_id'] ? 'Asignada' : 'Pendiente';
         $data['precio_base'] = $especialidad->precio_base;
         
         unset($data['email']);
 
-        Incidencia::create($data);
+        $this->incidenciaService->crear($data);
 
-        return redirect()->route('incidencias.index')->with('success', 'Incidencia creada exitosamente.');
+        return redirect()->route('incidencias.show', $data['localizador'])->with('success', 'Incidencia creada.');
     }
 
     public function show(Incidencia $incidencia)
@@ -98,9 +105,9 @@ class IncidenciaAdminController extends Controller
     {
         Gate::authorize('delete', $incidencia);
 
-        $incidencia->update(['estado' => 'Cancelada']);
+        $this->incidenciaService->cancelar($incidencia);
 
-        return redirect()->route('incidencias.index')->with('success', 'Incidencia eliminada exitosamente.');
+        return redirect()->route('incidencias.index')->with('success', 'Incidencia cancelada.');
     }
 
     public function asignarTecnico(Request $request, Incidencia $incidencia)
@@ -127,61 +134,18 @@ class IncidenciaAdminController extends Controller
             'estado' => 'required|in:Pendiente,Asignada,Finalizada,Cancelada',
         ]);
 
-        $incidencia->update(['estado' => $request->estado]);
-
-        if ($request->estado === 'Finalizada' && $incidencia->empresa_gestora_id) {
-            $this->generarComision($incidencia);
-        }
+        $this->incidenciaService->actualizarEstado($incidencia, $request->estado);
 
         return back()->with('success', 'Estado actualizado exitosamente.');
     }
 
-    private function generarLocalizador()
+    public function calendario()
     {
-        do {
-            $codigo = 'REP-' . date('Y') . '-' . str_pad(random_int(1, 9999), 4, '0', STR_PAD_LEFT);
-        } while( Incidencia::where('localizador', $codigo)->exists() );
+        Gate::authorize('viewCalendar', Incidencia::class);
 
-        return $codigo;
-    }
-
-    private function generarComision(Incidencia $incidencia)
-    {
-        $gestora = $incidencia->gestora_id;
-
-        Comision::create([
-            'gestora_id' => $gestora,
-            'incidencia_id' => $incidencia->id,
-            'precio_base' => $incidencia->precio_base,
-            'porcentaje_aplicado' => $gestora->porcentaje_comision,
-            'importe' => round($incidencia->precio_base * $gestora->porcentaje_comision / 100, 2),
-            'mes' => now()->month,
-            'anyo' => now()->year,
-        ]);
-    }
-
-    public function calendario() 
-    {
-        Gate::authorize('viewAny', Incidencia::class);
-
-        $incidencias = Incidencia::with(['cliente', 'tecnico', 'especialidad'])
-            ->whereNotIn('estado', ['Cancelada'])
-            ->get()
-            ->map(fn($inc) => [
-                'id' => $inc->id,
-                'localizador' => $inc->localizador,
-                'cliente' => $inc->cliente->nombre,
-                'especialidad' => $inc->especialidad->nombre_especialidad,
-                'fecha_servicio' => $inc->fecha_servicio->toIso8601String(),
-                'fecha_servicio_fmt' => $inc->fecha_servicio->format('d/m/Y H:i'),
-                'direccion' => $inc->direccion,
-                'descripcion' => $inc->descripcion,
-                'tipo_urgencia' => $inc->tipo_urgencia,
-                'estado' => $inc->estado,
-                'tecnico' => $inc->tecnico?->nombre_completo,
-                'url_detall' => route('incidencias.show', $inc->id),    
-            ]);
+        $incidencias = $this->incidenciaService->getCalendarDataForUser(auth()->user());
 
         return view('incidencias.calendario', compact('incidencias'));
     }
+
 }
