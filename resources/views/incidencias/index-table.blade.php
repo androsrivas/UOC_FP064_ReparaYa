@@ -29,15 +29,33 @@
         @endif
 
         <td class="px-6 py-4 text-right space-x-3">
-            <a href="{{ route('incidencias.show', $incidencia) }}" class="text-slate-400 hover:text-blue-600">
-                <i class="fa-solid fa-eye"></i>
-            </a>
+            <div class="flex items-center justify-end gap-3">
+                <a href="{{ route('incidencias.show', $incidencia) }}" class="text-slate-400 hover:text-blue-600">
+                    <i class="fa-solid fa-eye"></i>
+                </a>
 
-            @can('update', $incidencia)
-            <a href="{{ route('incidencias.edit', $incidencia) }}" class="text-slate-400 hover:text-amber-600">
-                <i class="fa-solid fa-pen-to-square"></i>
-            </a>
-            @endcan
+                @can('update', $incidencia)
+                <a href="{{ route('incidencias.edit', $incidencia) }}" class="text-slate-400 hover:text-amber-600">
+                    <i class="fa-solid fa-pen-to-square"></i>
+                </a>
+                @endcan
+
+                @can('cancel', $incidencia)
+                <a href="{{ route('incidencias.cancelar', $incidencia) }}" class="text-slate-400 hover:text-red-600">
+                    <i class="fa-solid fa-trash"></i>
+                </a>
+                @else
+                <form action="{{ route('cliente.incidencias.cancelar', $incidencia) }}" method="POST">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" onclick="return confirm('¿Estás seguro de cancelar la incidencia?')"
+                        class="text-slate-400 hover:text-red-600 transition-colors">
+                        <i class="fa-solid fa-trash"></i>
+                    </button>
+                </form>
+                @endif
+                @endcan
+            </div>
         </td>
     </tr>
     @endforeach
