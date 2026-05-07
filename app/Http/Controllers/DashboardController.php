@@ -14,6 +14,10 @@ class DashboardController extends Controller
     {
         $user = Auth::user();
 
+        // dd($user->rol);
+
+        $rol = strtolower($user->rol ?? '');
+
         if (!$user) {
             return redirect()->route('login');
         }
@@ -23,12 +27,12 @@ class DashboardController extends Controller
             'tecnico' => $this->getTecnicoData($user),
             'gestora' => $this->getGestoraData($user),
             'particular' => $this->getParticularData($user),
-            default => abort(403, 'Rol no definido'),
+            default => abort(403, "Rol '{$rol}' no válido para el usuario {$user->email}"),
         };
 
-        $data['title'] = 'Dashboard ' . ucfirst($user->rol);
+        $data['title'] = 'Dashboard ' . ucfirst($rol);
 
-        return view("dashboard.{$user->rol}", $data);
+        return view("dashboard.{$rol}", $data);
     }
 
     private function getUltimasIncidencias(User $user)
@@ -38,7 +42,9 @@ class DashboardController extends Controller
         match($user->rol) {
             'tecnico' => $query->where('tecnico_id', $user->id),
             'gestora' => $query->where('gestora_id', $user->id),
-            'particular' => $query->where('user_id', $user->id)
+            'particular' => $query->where('user_id', $user->id),
+            'admin' => null,
+            default => null,
         };
 
         return  $query->orderBy('created_at', 'desc')->take(5)->get();
