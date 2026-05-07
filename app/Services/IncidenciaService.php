@@ -5,10 +5,28 @@ namespace App\Services;
 use App\Models\Comision;
 use App\Models\Incidencia;
 use App\Models\User;
+use Exception;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class IncidenciaService
 {
+    public function verTodas(): Collection    
+    {
+        return Incidencia::with(['cliente', 'tecnico', 'especialidad', 'zona'])->get()->paginate(15)->withQueryString();
+    }
+
+    public function verPorCliente(int $cliente_id): Collection
+    {
+        return Incidencia::with(['especialidad', 'tecnico', 'zona'])
+            ->where('cliente_id', $cliente_id)
+            ->orderByDesc('created_at')
+            ->get()
+            ->paginate(15)
+            ->withQueryString();
+    }
+
     public function crear(array $data): Incidencia
     {
         return DB::transaction(function () use ($data) {
@@ -17,6 +35,16 @@ class IncidenciaService
             return $incidencia;
         });
     }
+
+    public function crearParaCliente(array $data): Incidencia
+    {
+        $data['cliente_id'] = Auth::id();
+        $data['estado'] = 'Pendiente';
+        $data['localizador'] = $this->generarLocalizador();
+
+        return Incidencia::create($data);
+    }
+
     public function actualizarEstado(Incidencia $incidencia, string $nuevoEstado): void
     {
         $incidencia->update(['estado' => $nuevoEstado]);
@@ -25,6 +53,7 @@ class IncidenciaService
             $this->generarComision($incidencia);
         }
     }
+
     public function generarLocalizador()
     {
         do {
@@ -63,14 +92,14 @@ class IncidenciaService
             $incidencia->update([
                 'estado' => 'Cancelada',
                 'cancelada_at' => now(),
-                'cancelada_por' => auth()->id(),
+                'cancelada_por' => Auth::id(),
             ]);
 
             return [
                 'success' => true,
                 'message' => 'Incidencia cancelada correctamente.'
             ];
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return [
                 'success' => false,
                 'message' => 'No se ha podido procesar la cancelación.'
