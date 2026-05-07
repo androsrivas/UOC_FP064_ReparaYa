@@ -44,6 +44,15 @@ class IncidenciaPolicy
     }
 
     /**
+     * Quien puede ver el calendario.
+     */
+    public function viewCalendar(User $user, Incidencia $incidencia): bool
+    {
+        return in_array($user->rol, ['admin', 'tecnico']);
+
+    }
+
+    /**
      * Quien puede crear incidencias.
      */
     public function create(User $user): bool
