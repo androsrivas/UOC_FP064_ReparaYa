@@ -3,11 +3,10 @@
 namespace App\Http\Controllers\Incidencia;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Incidencia\StoreIncidenciaRequest;
 use App\Models\Especialidad;
 use App\Models\Incidencia;
 use App\Models\Zona;
-use Carbon\Carbon;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 
 class IncidenciaClienteController extends Controller
@@ -55,7 +54,7 @@ class IncidenciaClienteController extends Controller
             ->with('success', '¡Solicitud creada!. Tu código es ' . $data['localizador'] . '.');
     }
 
-    public function cancel(Incidencia $incidencia) 
+    public function cancelar(Incidencia $incidencia) 
     {
         Gate::authorize('cancel', $incidencia);
 
