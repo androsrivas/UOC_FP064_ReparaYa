@@ -1,3 +1,3 @@
-<x-layouts.gestora>
+<x-layouts.app>
     
-</x-layouts.gestora>
+</x-layouts.app>

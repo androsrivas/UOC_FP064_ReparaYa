@@ -1,4 +1,4 @@
-<x-layouts.cliente>
+<x-layouts.app>
     <x-slot name="title">Mis Reparaciones — ReparaYa</x-slot>
 
     @php
@@ -11,7 +11,8 @@
             <p class="text-sm text-slate-500">Aquí puedes seguir el estado de tus incidencias abiertas.</p>
         </div>
         <div>
-            <a href="{{ route('cliente.incidencias.nueva-incidencia') }}" class="inline-block rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-800 transition-all">
+            <a href="{{ route('cliente.incidencias.nueva-incidencia') }}"
+                class="inline-block rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-800 transition-all">
                 + Reportar Avería
             </a>
         </div>
@@ -55,35 +56,37 @@
                         <x-ui.badge :estado="$incidencia->estado" />
                     </td>
                     <td class="px-6 py-4 text-right">
-                        <a href="{{ route('cliente.incidencias.show', $incidencia) }}" class="text-blue-600 hover:text-blue-900 font-semibold">
+                        <a href="{{ route('cliente.incidencias.show', $incidencia) }}"
+                            class="text-blue-600 hover:text-blue-900 font-semibold">
                             Ver detalles
                         </a>
                         @can('cancel', $incidencia)
-                            <form action="{{ route('cliente.incidencias.cancelar', $incidencia) }}" 
-                                method="POST" 
+                            <form action="{{ route('cliente.incidencias.cancelar', $incidencia) }}" method="POST"
                                 onsubmit="return confirm('¿Seguro que deseas cancelar esta incidencia? Recuerda que solo se puede hacer con 48h de antelación.')">
                                 @csrf
                                 @method('DELETE')
-                                
-                                <button type="submit" class="text-red-500 hover:text-red-700 font-medium text-sm transition-colors">
+
+                                <button type="submit"
+                                    class="text-red-500 hover:text-red-700 font-medium text-sm transition-colors">
                                     Cancelar
                                 </button>
                             </form>
                         @else
-                            <span class="text-slate-300 cursor-not-allowed" title="{{ $incidencia->estado === 'Finalizada' ? 'Ya está terminada' : 'Quedan menos de 48h' }}">
+                            <span class="text-slate-300 cursor-not-allowed"
+                                title="{{ $incidencia->estado === 'Finalizada' ? 'Ya está terminada' : 'Quedan menos de 48h' }}">
                                 <i class="fas fa-lock text-xs"></i>
                             </span>
-                        @endif
-                    @endcan
-                    </td>
-                </tr>
+                @endif
+            @endcan
+            </td>
+            </tr>
             @empty
                 <tr>
                     <td colspan="4" class="px-6 py-10 text-center text-slate-400">
                         No tienes incidencias registradas.
                     </td>
                 </tr>
-            @endforelse
-        </x-shared.table>>
-    </div>
-</x-layouts.cliente>
+                @endforelse
+            </x-shared.table>>
+        </div>
+    </x-layouts.app>
