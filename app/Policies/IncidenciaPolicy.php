@@ -4,7 +4,6 @@ namespace App\Policies;
 
 use App\Models\Incidencia;
 use App\Models\User;
-use Illuminate\Auth\Access\Response;
 
 class IncidenciaPolicy
 {
@@ -143,7 +142,7 @@ class IncidenciaPolicy
     {
         // Solo el cliente/particular puede cancelar sus propias incidencias
         if ($user->rol === 'particular') {
-            return $incidencia->cliente_id === $user->id;
+            return $incidencia->cliente_id === $user->id && $incidencia->puedeCancelar();
         }
 
         // La gestora puede cancelar las incidencias que gestiona
