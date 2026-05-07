@@ -1,24 +1,36 @@
 @props(['items' => []])
 
+@php
+    $rol = auth()->user()->rol;
+    $ui = config("ui.roles.{$rol}.theme");
+
+    $homeRoute = match($rol) {
+        'tecnico' => 'tecnico.agenda',
+        'particular' => 'cliente.incidencias',
+        'gestora' => 'gestora.incidencias',
+        default => 'dashboard',
+    };
+@endphp
+
 <nav class="flex text-gray-500 text-sm" aria-label="Breadcrumb">
     <ol class="inline-flex items-center space-x-1 md:space-x-3">
         <li class="inline-flex items-center">
-            <a href="{{ route('dashboard') }}" class="hover:text-blue-600 inline-flex items-center transition">
-                <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path></svg>
-                Inicio
+            <a href="{{ route($homeRoute) }}" class="hover:{{ $ui['accent'] }} inline-flex items-center transition-colors">
+                <i class="fa-solid fa-house text-xs mr-2"></i>
+                <span class="hidden sm:inline">Inicio</span>
             </a>
         </li>
 
         @foreach($items as $label => $link)
             <li class="flex items-center">
-                <svg class="w-6 h-6 text-gray-300" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
+                <i class="fa-solid fa-chevron-right text-[10px] text-slate-300 mx-1 md:mx-2"></i>
                 
-                @if(!$loop->last)
-                    <a href="{{ $link }}" class="ml-1 md:ml-2 hover:text-blue-600 font-medium transition">
+                @if(!$loop->last && $link)
+                    <a href="{{ $link }}" class="hover:{{ $ui['accent'] }} font-medium transition-colors whitespace-nowrap">
                         {{ $label }}
                     </a>
                 @else
-                    <span class="ml-1 md:ml-2 text-gray-900 font-bold" aria-current="page">
+                    <span class="text-slate-900 font-bold whitespace-nowrap" aria-current="page">
                         {{ $label }}
                     </span>
                 @endif
