@@ -7,16 +7,24 @@ use App\Http\Requests\Incidencia\StoreIncidenciaRequest;
 use App\Models\Especialidad;
 use App\Models\Incidencia;
 use App\Models\Zona;
+use App\Services\IncidenciaService;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 
 class IncidenciaClienteController extends Controller
 {
+    protected IncidenciaService $incidenciaService;
+
+    public function __construct(IncidenciaService $incidenciaService)
+    {
+        $this->incidenciaService = $incidenciaService;
+    }
+
     public function index()
     {
-        $incidencias = Incidencia::with(['especialidad', 'tecnico', 'zona'])
-            ->where('cliente_id', auth()->id())
-            ->orderByDesc('created_at')
-            ->get();
+        Gate::authorize('viewAny', Incidencia::class);
+
+        $incidencias = $this->incidenciaService->verPorCliente(Auth::id());
 
         return view('cliente.incidencias', compact('incidencias'));
     }
@@ -44,7 +52,7 @@ class IncidenciaClienteController extends Controller
         
         $data = $request->validated();
 
-        $data['cliente_id'] = auth()->id();
+        $data['cliente_id'] = Auth::id();
         $data['estado'] = 'Pendiente';
         $data['localizador'] = $this->generarLocalizador();
 
