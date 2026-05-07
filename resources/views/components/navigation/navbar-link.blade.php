@@ -1,11 +1,17 @@
-@props(['href', 'active' => false])
+@props(['route', 'active' => null])
 
 @php
-    $classes = ($active ?? false)
-        ? 'inline-flex items-center px-1 pt-1 border-b-2 border-blue-500 text-sm font-medium leading-5 text-gray-900 focus:outline-none focus:border-blue-700 transition duration-150 ease-in-out h-full'
-        : 'inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium leading-5 text-gray-500 hover:text-gray-700 hover:border-gray-300 focus:outline-none focus:text-gray-700 focus:border-gray-300 transition duration-150 ease-in-out h-full';
+    $rol = auth()->user()->rol;
+    $ui = config("ui.roles.{$rol}.theme");
+    $isActive = $active ?? request()->routeIs($route . '*');
+
+    $baseClasses = 'inline-flex items-center px-4 pt-1 text-sm font-medium leading-5 transition duration-150 ease-in-out h-full border-b-2';
+    
+    $themeClasses = $isActive 
+        ? $ui['active'] 
+        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300';
 @endphp
 
-<a {{ $attributes->merge(['href' => $href, 'class' => $classes]) }}>
+<a href="{{ route($route) }}" {{ $attributes->merge(['class' => "{$baseClasses} {$themeClasses}"]) }}>
     {{ $slot }}
 </a>
