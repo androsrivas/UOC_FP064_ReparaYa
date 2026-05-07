@@ -5,14 +5,15 @@ namespace App\Http\Controllers\Incidencia;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Auth;
 use App\Models\Especialidad;
 use App\Models\Incidencia;
 use App\Models\Tecnico;
 use App\Models\User;
 use App\Models\Zona;
+use App\Services\IncidenciaService;
 use App\Http\Requests\Incidencia\StoreIncidenciaRequest;
 use App\Http\Requests\Incidencia\UpdateIncidenciaRequest;
-use App\Services\IncidenciaService;
 
 class IncidenciaAdminController extends Controller
 {
@@ -143,7 +144,7 @@ class IncidenciaAdminController extends Controller
     {
         Gate::authorize('viewCalendar', Incidencia::class);
 
-        $incidencias = $this->incidenciaService->getCalendarDataForUser(auth()->user());
+        $incidencias = $this->incidenciaService->getCalendarDataForUser(Auth::user());
 
         return view('incidencias.calendario', compact('incidencias'));
     }
