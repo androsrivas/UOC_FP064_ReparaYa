@@ -1,39 +1,19 @@
-<aside class="w-64 bg-gray-900 text-white flex flex-col shrink-0">
+@php
+    $rol = auth()->user()->rol;
+    $ui = config("ui.roles.{$rol}", config('ui.roles.particular'));
+@endphp
 
-    <div class="h-16 flex items-center justify-center border-b border-gray-700">
-        <span class="text-xl font-bold text-blue-400">🔧 ReparaYa</span>
+<aside class="fixed inset-y-0 left-0 z-50 flex w-64 flex-col border-r border-slate-200 bg-white">
+
+    <div class="h-16 flex items-center border-b border-slate-200 px-6 font-serif text-xl text-blue-950">
+        <span class="mr-2 text-blue-600">🔧</span> ReparaYa
     </div>
 
-    <nav class="flex-1 px-4 py-6 space-y-1 overflow-y-auto">
-
-        @auth
-            @if(auth()->user()->isAdmin())
-                <x-navigation.sidebar-link route="dashboard"         icon="🏠" label="Panel" />
-                <x-navigation.sidebar-link route="incidencias.index" icon="📋" label="Incidencias" />
-                <x-navigation.sidebar-link route="tecnicos.index"    icon="👷" label="Técnicos" />
-                <x-navigation.sidebar-link route="especialidades.index" icon="🔧" label="Especialidades" />
-                <x-navigation.sidebar-link route="gestoras.index"    icon="🏢" label="Gestoras" />
-                <x-navigation.sidebar-link route="comisiones.index"  icon="💰" label="Liquidaciones" />
-                <x-navigation.sidebar-link route="calendario"        icon="📅" label="Calendario" />
-            @endif
-
-            @if(auth()->user()->isTecnico())
-                <x-navigation.sidebar-link route="tecnico.agenda"    icon="📅" label="Mi agenda" />
-            @endif
-
-            @if(auth()->user()->isParticular())
-                <x-navigation.sidebar-link route="cliente.incidencias"   icon="📋" label="Mis avisos" />
-                <x-navigation.sidebar-link route="cliente.nova"          icon="➕" label="Nueva solicitud" />
-                <x-navigation.sidebar-link route="cliente.perfil"        icon="👤" label="Mi perfil" />
-            @endif
-
-            @if(auth()->user()->isGestora())
-                <x-navigation.sidebar-link route="gestora.incidencias"  icon="📋" label="Mis serveis" />
-                <x-navigation.sidebar-link route="gestora.nova"         icon="➕" label="Nueva incidencia" />
-                <x-navigation.sidebar-link route="gestora.comisiones"   icon="💰" label="Mis comisiones" />
-            @endif
-        @endauth
-
+    <nav class="flex-1 flex-col gap-1  p-4 overflow-y-auto">
+        @includeFirst([
+            "navigation.menus.{$rol}",
+            'navigation.menus.default'
+        ])
     </nav>
 
     <div class="p-4 border-t border-gray-700">
