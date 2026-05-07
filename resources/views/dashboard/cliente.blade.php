@@ -58,7 +58,7 @@
                         <a href="{{ route('cliente.incidencias.show', $incidencia) }}" class="text-blue-600 hover:text-blue-900 font-semibold">
                             Ver detalles
                         </a>
-                        @if($incidencia->puedeCancelar())
+                        @can('cancel', $incidencia)
                             <form action="{{ route('cliente.incidencias.cancelar', $incidencia) }}" 
                                 method="POST" 
                                 onsubmit="return confirm('¿Seguro que deseas cancelar esta incidencia? Recuerda que solo se puede hacer con 48h de antelación.')">
@@ -74,6 +74,7 @@
                                 <i class="fas fa-lock text-xs"></i>
                             </span>
                         @endif
+                    @endcan
                     </td>
                 </tr>
             @empty
