@@ -33,7 +33,7 @@ class StoreIncidenciaRequest extends FormRequest
             'direccion' => 'required|string|max:255',
             'poblacion' => 'required|string|max:100',
             'codigo_postal' => 'required|string|max:5',
-            'fecha_servicio' => ['required', 'date', new FechaServicioValida()],
+            'fecha_servicio' => ['required', 'date', new FechaServicioValida($this->input('tipo_urgencia'))],
             'tipo_urgencia' => 'required|in:Estándar,Urgente',
             'precio_base' => 'required|numeric|min:0',
             'tecnico_id' => 'nullable|exists:tecnicos,id',
