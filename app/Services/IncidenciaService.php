@@ -2,17 +2,19 @@
 
 namespace App\Services;
 
+use App\DTOs\CalendarEvent;
 use App\Models\Comision;
 use App\Models\Incidencia;
 use App\Models\User;
 use Exception;
+use Illuminate\Auth\Access\Gate;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class IncidenciaService
 {
-    public function verTodas(): Collection    
+    public function verTodas(): Collection
     {
         return Incidencia::with(['cliente', 'tecnico', 'especialidad', 'zona'])->get()->paginate(15)->withQueryString();
     }
@@ -124,30 +126,32 @@ class IncidenciaService
         return null;
     }
 
-    public function getCalendarDataForUser(User $user)
+    public function getCalendarEvents(?int $userId = null): array
     {
-        $query = Incidencia::with(['cliente', 'tecnico', 'especialidad'])
-            ->whereNotIn('estado', ['Cancelada']);
+        $user = $userId ? User::findOrFail($userId) : Auth::user();
+        $query = Incidencia::with(['cliente', 'tecnico', 'especialidad']);
 
-        if ($user->rol === 'tecnico') {
-            $query->where('tecnico_id', $user->id);
+        if ($user->isTecnico()) {
+            $query->where('tecnico_id', $user->tecnico->id);
+        } elseif($user->isAdmin()) {
+            $query->whereNotNull('tecnico_id');
         }
 
-        return $query->get()->map(fn($inc) => [
-            'REF:'             => $inc->localizador,
-            'title'          => "{$inc->titulo} - {$inc->cliente->name}",
-            'url'            => route('incidencias.show', $inc->id),
-
-            'extendedProps' => [
-                'tecnico'      => $inc->tecnico?->name ?? 'Sin asignar',
-                'especialidad' => $inc->especialidad->nombre_especialidad,
-                'urgencia'     => $inc->tipo_urgencia,
-            ],
-
-            'backgroundColor' => $this->getColorPorEstado($inc->estado),
-            'borderColor'     => $this->getColorPorEstado($inc->estado),
-            'textColor'       => '#ffffff',
-        ]);
+        return $query->whereNotIn('estado', ['Cancelada'])
+            ->get()
+            ->map(fn(Incidencia $inc): array => ( new CalendarEvent(
+                localizador: $inc->localizador,
+                title: $inc->titulo,
+                start: $inc->fecha_servicio,
+                end: $inc->fecha_servicio,
+                color: $this->getColorPorEstado($inc->estado),
+                extendedProps: [
+                    'cliente' => $inc->cliente->nombre,
+                    'especialidad' => $inc->especialidad->nombre_especialidad,
+                    'url_detalle' => route('incidencias.show', $inc->id),
+                ],
+            ))->toArray())
+            ->toArray();
     }
 
     private function getColorPorEstado(string $estado): string
