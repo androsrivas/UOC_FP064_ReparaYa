@@ -28,13 +28,7 @@ class IncidenciaAdminController extends Controller
     {
         Gate::authorize('viewAny', Incidencia::class);
 
-        $incidencias = Incidencia::with(['cliente', 'tecnico', 'especialidad', 'zona'])
-            ->when($request->estado, fn($q, $v) => $q->where('estado', $v))
-            ->when($request->urgencia, fn($q, $v) => $q->where('tipo_urgencia', $v))
-            ->when($request->especialidad, fn($q, $v) => $q->where('especialidad_id', $v))
-            ->orderByDesc('created_at')
-            ->paginate(15)
-            ->withQueryString();
+        $incidencias = $this->incidenciaService->verTodas();
 
         $especialidades = Especialidad::all();
 
