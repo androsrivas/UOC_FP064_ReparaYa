@@ -20,6 +20,7 @@ class IncidenciasSeeder extends Seeder
                 'tecnico_id' => 1,
                 'especialidad_id' => ($i % 2) + 1,
                 'zona_id' => ($i % 4) + 1,
+                'titulo' => 'Incidencia ' . ($i + 1),
                 'descripcion' => 'Incidencia de prueba' . ($i + 1),
                 'direccion' => 'Carrer Eixample' . ($i + 1),
                 'poblacion' => 'Barcelona',

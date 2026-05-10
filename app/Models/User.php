@@ -48,6 +48,11 @@ class User extends Authenticatable
         ];
     }
 
+    public function getNameAttribute(): string
+    {
+        return $this->nombre;
+    }
+
     // Helpers de rol
     public function isAdmin():bool {
         return $this->rol === 'admin';

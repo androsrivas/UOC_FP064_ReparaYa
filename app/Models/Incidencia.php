@@ -15,6 +15,7 @@ class Incidencia extends Model
         'tecnico_id',
         'especialidad_id',
         'zona_id',
+        'titulo',
         'descripcion',
         'direccion',
         'poblacion',
@@ -22,12 +23,15 @@ class Incidencia extends Model
         'fecha_servicio',
         'tipo_urgencia',
         'estado',
+        'cancel_at',
+        'cancel_by',
         'precio_base',
         'gstora_id',
     ];
 
     protected $casts = [
         'fecha_servicio' => 'datetime',
+        'cancel_at' => 'datetime',
     ];
 
     public function cliente(): BelongsTo
@@ -58,10 +62,5 @@ class Incidencia extends Model
     public function gestora(): BelongsTo
     {
         return $this->belongsTo(Gestora::class, 'gestora_id');
-    }
-
-    public function puedeCancelar(): bool
-    {
-        return $this->fecha_servicio->diffInHours(now()) > 48 && !in_array($this->estado, ['Cancelada', 'Finalizada']);
     }
 }

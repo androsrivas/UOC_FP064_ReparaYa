@@ -2,6 +2,20 @@
 
 <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
 
+    {{-- Título --}}
+    <div class="col-span-2">
+        <label class="block text-sm font-medium text-gray-700 mb-1">
+            Título de la incidencia
+        </label>
+        <p name="titulo" rows="4"
+                  placeholder="Describe la incidencia con el máximo detalle posible..."
+                  class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm 
+                         resize-none focus:outline-none focus:ring-2 focus:ring-blue-500">{{ old('titulo', $incidencia->titulo ?? '') }}</p>
+        @error('titulo')
+            <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+        @enderror
+    </div>
+
     {{-- Cliente — solo admin al crear --}}
     @if(!$edit)
     <div class="col-span-2">

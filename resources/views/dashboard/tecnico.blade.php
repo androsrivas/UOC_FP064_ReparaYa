@@ -1,3 +1,3 @@
-<x-layouts.base>
+<x-layouts.app>
     
-</x-layouts.base>
+</x-layouts.app>
