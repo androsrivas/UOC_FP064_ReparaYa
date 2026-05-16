@@ -12,14 +12,18 @@ use App\Models\Zona;
 
 class IncidenciaAdminController extends Controller
 {
+    protected IncidenciaService $service;
+
+    public function __construct(IncidenciaService $service)
+    {
+        $this->service = $service;
+    }
+
     public function index(Request $request)
     {
-        $incidencias = Incidencia::with(['cliente', 'tecnico', 'especialidad', 'zona'])
-            ->when($request->estado, fn($q, $v) => $q->where('estado', $v))
-            ->when($request->urgencia, fn($q, $v) => $q->where('tipo_urgencia', $v))
-            ->when($request->especialidad, fn($q, $v) => $q->where('especialidad_id', $v))
-            ->orderByDesc('created_at')
-            ->paginate(15);
+        Gate::authorize('viewAny', Incidencia::class);
+
+        $incidencias = $this->service->verTodas();
 
         $especialdiades = Especialidad::all();
 
@@ -52,20 +56,23 @@ class IncidenciaAdminController extends Controller
 
         $especialidad = Especialidad::find($data['especialidad_id']);
 
-        $data['localizador'] = $this->generarLocalizador();
+        $data['cliente_id'] = $cliente->id;
+        $data['localizador'] = $this->service->generarLocalizador();
         $data['estado'] = $data['tecnico_id'] ? 'Asignada' : 'Pendiente';
         $data['precio_base'] = $especialidad->precio_base;
 
         Incidencia::create($data);
 
-        return redirect()->route('incidencias.index')->with('success', 'Incidencia creada exitosamente.');
+        $this->service->crearParaAdmin($data);
+
+        return redirect()->route('incidencias.show', $data['localizador'])->with('success', 'Incidencia creada.');
     }
 
     public function show(Incidencia $incidencia)
     {
-        $incidencia->load(['cliente', 'tecnico', 'especialidad', 'zona', 'comision']);
+        Gate::authorize('view', $incidencia);
 
-        return view('incidencias.show', compact('incidencia'));
+        return view('incidencias.show', compact('incidencia', 'tecnicos'));
     }
 
     public function edit(Incidencia $incidencia)
@@ -79,16 +86,8 @@ class IncidenciaAdminController extends Controller
 
     public function update(Request $request, Incidencia $incidencia)
     {
-         $data = $request->validate([
-            'especialidad_id' => 'required|exists:especialidades,id',
-            'zona_id' => 'required|exists:zonas,id',
-            'descripcion' => 'required|string|max:1000',
-            'direccion' => 'required|string|max:255',
-            'poblacion' => 'required|string|max:100',
-            'codigo_postal' => 'required|string|max:5',
-            'fecha_servicio' => 'required|date|after:now',
-            'tipo_urgencia' => 'required|in:Estándar,Urgente',
-        ]);
+        Gate::authorize('update', $incidencia);
+        $data = $request->validated();
 
         $incidencia->update($data);
 
@@ -99,7 +98,9 @@ class IncidenciaAdminController extends Controller
     {
         $incidencia->update(['estado' => 'Cancelada']);
 
-        return redirect()->route('incidencias.index')->with('success', 'Incidencia eliminada exitosamente.');
+        $this->service->cancelar($incidencia);
+
+        return redirect()->route('incidencias.index')->with('success', 'Incidencia cancelada.');
     }
 
     public function asignarTecnico(Request $request, Incidencia $incidencia)
@@ -122,36 +123,17 @@ class IncidenciaAdminController extends Controller
             'estado' => 'required|in:Pendiente,Asignada,Finalizada,Cancelada',
         ]);
 
-        $incidencia->update(['estado' => $request->estado]);
-
-        if ($request->estado === 'Finalizada' && $incidencia->empresa_gestora_id) {
-            $this->generarComision($incidencia);
-        }
+        $this->service->actualizarEstado($incidencia, $request->estado);
 
         return back()->with('success', 'Estado actualizado exitosamente.');
     }
 
     private function generarLocalizador()
     {
-        do {
-            $codigo = 'REP-' . date('Y') . '-' . str_pad(random_int(1, 9999), 4, '0', STR_PAD_LEFT);
-        } while( Incidencia::where('localizador', $codigo)->exists() );
+        Gate::authorize('viewCalendar', Incidencia::class);
 
-        return $codigo;
-    }
+        $incidencias = $this->service->getCalendarDataForUser(Auth::user());
 
-    private function generarComision(Incidencia $incidencia)
-    {
-        $gestora = $incidencia->gestora;
-
-        Comision::create([
-            'gestora_id' => $gestora->id,
-            'incidencia_id' => $incidencia->id,
-            'precio_base' => $incidencia->precio_base,
-            'porcentaje_aplicado' => $gestora->porcentaje_comision,
-            'importe' => round($incidencia->precio_base * $gestora->porcentaje_comision / 100, 2),
-            'mes' => now()->month,
-            'anyo' => now()->year,
-        ]);
+        return view('incidencias.calendario', compact('incidencias'));
     }
 }
